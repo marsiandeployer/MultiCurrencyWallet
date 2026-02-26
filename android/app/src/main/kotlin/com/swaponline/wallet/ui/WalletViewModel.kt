@@ -28,6 +28,7 @@ class WalletViewModel(application: Application) : AndroidViewModel(application) 
             _uiState.value = _uiState.value.copy(
                 mnemonicWords = snapshot.mnemonicWords,
                 privateKeyHex = snapshot.privateKeyHex,
+                importPhrase = snapshot.mnemonicWords.joinToString(" "),
                 savedAt = formatTimestamp(System.currentTimeMillis()),
                 error = null,
             )
@@ -38,11 +39,34 @@ class WalletViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
+    fun updateImportPhrase(value: String) {
+        _uiState.value = _uiState.value.copy(importPhrase = value)
+    }
+
+    fun importAndSaveWallet() {
+        runCatching {
+            WalletGenerator.importWallet(_uiState.value.importPhrase).also(storage::save)
+        }.onSuccess { snapshot ->
+            _uiState.value = _uiState.value.copy(
+                mnemonicWords = snapshot.mnemonicWords,
+                privateKeyHex = snapshot.privateKeyHex,
+                importPhrase = snapshot.mnemonicWords.joinToString(" "),
+                savedAt = formatTimestamp(System.currentTimeMillis()),
+                error = null,
+            )
+        }.onFailure { error ->
+            _uiState.value = _uiState.value.copy(
+                error = error.message ?: "Failed to import wallet",
+            )
+        }
+    }
+
     fun loadSavedWallet() {
         val saved = storage.load() ?: return
         _uiState.value = _uiState.value.copy(
             mnemonicWords = saved.snapshot.mnemonicWords,
             privateKeyHex = saved.snapshot.privateKeyHex,
+            importPhrase = saved.snapshot.mnemonicWords.joinToString(" "),
             savedAt = formatTimestamp(saved.savedAtMillis),
             error = null,
         )
@@ -60,6 +84,7 @@ class WalletViewModel(application: Application) : AndroidViewModel(application) 
 data class WalletUiState(
     val mnemonicWords: List<String> = emptyList(),
     val privateKeyHex: String = "",
+    val importPhrase: String = "",
     val savedAt: String? = null,
     val error: String? = null,
 )

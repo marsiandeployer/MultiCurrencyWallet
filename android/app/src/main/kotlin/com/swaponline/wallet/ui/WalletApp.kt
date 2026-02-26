@@ -16,6 +16,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -40,6 +41,8 @@ fun WalletApp(walletViewModel: WalletViewModel = viewModel()) {
                 state = uiState,
                 onCreateWallet = walletViewModel::createAndSaveWallet,
                 onLoadWallet = walletViewModel::loadSavedWallet,
+                onImportPhraseChange = walletViewModel::updateImportPhrase,
+                onImportWallet = walletViewModel::importAndSaveWallet,
             )
         }
     }
@@ -50,6 +53,8 @@ private fun WalletScreen(
     state: WalletUiState,
     onCreateWallet: () -> Unit,
     onLoadWallet: () -> Unit,
+    onImportPhraseChange: (String) -> Unit,
+    onImportWallet: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -79,6 +84,19 @@ private fun WalletScreen(
             OutlinedButton(onClick = onLoadWallet) {
                 Text("Load saved")
             }
+        }
+
+        OutlinedTextField(
+            value = state.importPhrase,
+            onValueChange = onImportPhraseChange,
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text("Import 12 words") },
+            supportingText = { Text("Enter words separated by spaces") },
+            minLines = 2,
+        )
+
+        OutlinedButton(onClick = onImportWallet) {
+            Text("Import wallet")
         }
 
         Card(

@@ -79,4 +79,4 @@ Any questions [are welcome](https://t.me/swaponline)
 ## Engineering updates
 
 - Android CI workflow added: `.github/workflows/android-ci.yml` (build + unit tests for `android/` project)
-- Native Android MVP wallet scaffold added in `android/` (key + 12-word seed generation, local encrypted storage, no exchange)
+- Native Android MVP wallet scaffold added in `android/` (create/import by 12-word seed, local encrypted storage, no exchange)
