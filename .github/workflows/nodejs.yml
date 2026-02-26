@@ -6,6 +6,7 @@ on:
       - "android/**"
       - "docs/**"
       - ".github/workflows/android-ci.yml"
+      - ".github/workflows/nodejs.yml"
 
 jobs:
   build:
