@@ -211,3 +211,35 @@
 - `curl https://swaponline.github.io/wallet-apps-bridge-client.js | grep isMetaMask` → `isMetaMask:!0` (minified true)
 - Last-Modified: Thu, 26 Feb 2026 16:16:07 GMT
 - CI checks passed: build + preview both green after TypeScript fix
+
+## Task 11: Deploy unifactory (dex.onout.org)
+
+**Status:** Done
+**Commits:** e9a5c21 (PR #243 merge), 03305f0 (contenthash fix)
+**Agent:** deployer
+**Summary:** Deployed unifactory React code (Tasks 3-6) to dex.onout.org production server. Initial deployment (20:09 UTC) succeeded but Cloudflare served stale cached JS (age: 5 hours, cache TTL: 7 days). Root cause: build script used static filenames without content hash. Fixed by modifying `scripts/build-non-split.js` to use `[contenthash:8]` in output filenames. Rebuilt and redeployed (21:12 UTC) with hashed filenames (main.2c4d85d7.chunk.js instead of main.chunk.js). Cloudflare immediately served fresh version with bridge code.
+**Deviations:** Added extra deployment step to resolve Cloudflare caching issue. Changed build configuration permanently to include content hash for all future deployments.
+
+**Verification:**
+- Initial deploy: `sudo cp -r build/* /var/www/dex.onout.org/` at 20:09 UTC
+- Problem detected: `curl https://dex.onout.org/static/js/main.chunk.js | grep isSwapWalletAppsBridge` → 0 (cached)
+- Cache-bypass test: `curl "...main.chunk.js?v=12345" | grep isSwapWalletAppsBridge` → 1 (server had new version)
+- Fix applied: Modified build-non-split.js to add contenthash, rebuilt, redeployed at 21:12 UTC
+- Verification: `curl https://dex.onout.org/static/js/main.2c4d85d7.chunk.js | grep isSwapWalletAppsBridge` → 1 ✅
+- Index.html updated: references main.2c4d85d7.chunk.js with correct hash
+- unifactory repo updated: commit 03305f0 pushed to origin/main
+
+## Task 12: Post-deploy verification
+
+**Status:** Done
+**Agent:** qa-verifier
+**Summary:** Executed full post-deploy QA on live production URLs. Initial QA (round 1) detected critical issue: unifactory React code missing from production due to Cloudflare cache serving stale bundle. After Task 11 fix (contenthash in filenames + redeploy), second QA round passed with zero critical/major findings. Verified: bridge client deployed with isMetaMask: true, DEX bundle contains all React bridge code (Tasks 4-6), inline script loads correctly, MCW routes to correct iframe URL, all 27 unit tests pass. 5 acceptance criteria deferred to manual browser verification (auto-connect flow, balance match, network switch, standalone mode, no-wallet fallback).
+**Deviations:** Two-round QA instead of one due to Cloudflare cache issue discovered in round 1.
+
+**Verification:**
+- Round 1 (post-Task 10, pre-Task 11 fix): 1 critical, 2 major findings → [logs/working/post-deploy-qa-report.json]
+- Round 2 (post-Task 11 fix): 0 critical, 0 major, 20/30 automated checks passed → same file updated
+- Bridge client: `curl https://swaponline.github.io/wallet-apps-bridge-client.js | grep isMetaMask` → `isMetaMask:!0` ✅
+- DEX bundle: `curl https://dex.onout.org/static/js/main.2c4d85d7.chunk.js | grep -c isSwapWalletAppsBridge` → 3 ✅
+- MCW tests: `npx jest tests/unit/walletBridge.test.ts` → 27 passed ✅
+- Deferred to manual: AC1 (auto-connect in Apps), AC2 (balance match), AC3 (standalone unchanged), AC4 (no-wallet fallback), AC5 (network switch)
