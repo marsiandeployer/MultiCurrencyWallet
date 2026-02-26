@@ -38,6 +38,7 @@ We solve this by providing a client-side wallet supporting multiple blockchains 
 - **P2P order book** - Decentralized order matching via libp2p gossipsub, no central server
 - **Client-side keys** - Private keys never leave the browser/extension, derived from mnemonic phrase
 - **Multiple deployment modes** - Web SPA (GitHub Pages), Chrome extension, WordPress widget, embeddable iframe
+- **Wallet Apps** - Integrated dApps (DEX, DeFi protocols) in iframe with EIP-1193 bridge for seamless wallet connection, no modal popups
 
 <!--
 Feature backlog, detailed roadmap, and development phases live in the project backlog

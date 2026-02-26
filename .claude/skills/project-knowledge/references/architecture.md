@@ -27,10 +27,12 @@ Technical architecture overview for AI agents. Helps agents understand HOW the s
 ├── src/
 │   ├── front/              # React SPA (wallet UI)
 │   │   ├── client/         # Entry point: index.tsx → createRoot()
+│   │   │   └── wallet-apps-bridge-client.js  # EIP-1193 bridge provider (injected in dApp iframes)
 │   │   ├── config/         # Environment configs (testnet.dev.js, mainnet.prod.js)
 │   │   ├── shared/         # Main application code
 │   │   │   ├── redux/      # State (redaction v5, NOT raw Redux)
-│   │   │   ├── pages/      # Route components (Wallet, Exchange, Swap)
+│   │   │   ├── pages/      # Route components (Wallet, Exchange, Swap, Apps)
+│   │   │   │   └── Apps/   # Wallet Apps page (iframe host, bridge protocol)
 │   │   │   ├── components/ # Reusable UI components
 │   │   │   ├── helpers/    # Per-currency blockchain helpers
 │   │   │   └── routes/     # React Router v5 routes
@@ -100,6 +102,8 @@ Technical architecture overview for AI agents. Helps agents understand HOW the s
 **Transaction send:** User fills form → Redux action → blockchain helper (btc.ts / ethLikeAction.ts) → sign with private key → broadcast via RPC → poll for confirmation → update balance.
 
 **Atomic swap:** User creates order → broadcast to libp2p pubsub → peer accepts → HTLC contract deployed on both chains → secret exchange → funds released.
+
+**Wallet Apps iframe bridge:** User opens Apps page → clicks dApp → MCW renders iframe with `?walletBridge=swaponline` param → dApp loads bridge-client.js → bridge client sends HELLO via postMessage → MCW host responds with READY (includes wallet address) → dApp auto-connects via EIP-1193 provider → seamless UX without wallet modal.
 
 **State management:** Redux (via redaction) stores user keys, balances, swap history, order book. Only `rememberedSwaps` and `user` slices persist to localStorage.
 

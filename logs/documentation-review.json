@@ -1,0 +1,120 @@
+{
+  "status": "changes_required",
+  "summary": "CLAUDE.md contains extensive detailed technical information (140 lines, >7KB) that should be in architecture.md and patterns.md. This is a critical violation of documentation principles - CLAUDE.md must be a minimal pointer to project-knowledge, not contain detailed information. Several major issues: code blocks in CLAUDE.md, operational details missing from deployment.md, and empty template sections in patterns.md.",
+  "filesReviewed": [
+    "CLAUDE.md",
+    "project.md",
+    "architecture.md",
+    "patterns.md",
+    "deployment.md",
+    "ux-guidelines.md"
+  ],
+  "findings": [
+    {
+      "severity": "critical",
+      "category": "bloat",
+      "file": "CLAUDE.md",
+      "section": "Entire file",
+      "description": "CLAUDE.md is 140 lines and contains extensive technical information including build commands, architecture details, source layout, architectural patterns, build system description, code style, dependencies, and important notes. This violates documentation principles - CLAUDE.md should be a minimal entry point (project name, one-line description, pointer to project-knowledge), not contain detailed information.",
+      "recommendation": "Reduce CLAUDE.md to <20 lines containing only: project name, one-line description, pointer to .claude/skills/project-knowledge/references/, backlog path (if exists), and default branch. Move all detailed content to appropriate reference files: build commands and code style → patterns.md, architecture details → architecture.md, dependencies → architecture.md."
+    },
+    {
+      "severity": "major",
+      "category": "code-in-docs",
+      "file": "CLAUDE.md",
+      "section": "Build & Development Commands, Source Layout",
+      "description": "CLAUDE.md contains large code blocks: 35-line bash script block with all npm commands (lines 13-47) and 27-line directory tree structure (lines 54-81). These are code/pseudocode in documentation.",
+      "recommendation": "Remove code blocks from CLAUDE.md entirely. If build commands are essential, condense to a one-line reference in patterns.md: 'See package.json scripts or run npm run for available commands.' Directory structure should link to actual src/ directory, not embed ASCII tree."
+    },
+    {
+      "severity": "major",
+      "category": "generic-content",
+      "file": "CLAUDE.md",
+      "section": "Key Architectural Patterns",
+      "description": "CLAUDE.md contains generic framework explanations that belong in official docs, not project docs. Examples: 'React Router v5 uses <Switch>/<Route>' (generic React Router knowledge), 'Webpack and tsconfig define path aliases' (generic Webpack pattern), 'redaction generates action types from reducer names' (generic library behavior).",
+      "recommendation": "Remove generic framework explanations. Keep only project-specific decisions: WHY redaction was chosen over raw Redux, WHY React Router v5 (not v6), WHAT aliases are critical for this project. Generic 'how it works' belongs in official library docs."
+    },
+    {
+      "severity": "major",
+      "category": "duplication",
+      "file": "CLAUDE.md + architecture.md",
+      "section": "Tech stack, dependencies, source layout",
+      "description": "Significant duplication between CLAUDE.md and architecture.md: both describe source layout, both list key dependencies with versions, both explain architectural patterns. Information lives in TWO places instead of ONE.",
+      "recommendation": "Consolidate all technical architecture details into architecture.md. CLAUDE.md should only point to it: 'See .claude/skills/project-knowledge/references/ for full documentation.' Remove lines 49-140 from CLAUDE.md."
+    },
+    {
+      "severity": "major",
+      "category": "wrong-placement",
+      "file": "CLAUDE.md",
+      "section": "Code Style (lines 108-116)",
+      "description": "Code style rules (no semicolons, single quotes, 2-space indent, max line length) are in CLAUDE.md instead of patterns.md. CLAUDE.md should not contain coding conventions.",
+      "recommendation": "Move code style section to patterns.md under 'Project-Specific Code Patterns'. CLAUDE.md must not contain implementation details."
+    },
+    {
+      "severity": "major",
+      "category": "missing-operational",
+      "file": "deployment.md",
+      "section": "Environment Variables",
+      "description": "ENV vars section lists only build-time variables (CONFIG, NODE_ENV, DEBUG) but doesn't specify WHERE these are set during deployment. GitHub Actions workflow exists but isn't documented - which workflow file? What secrets are configured? How to update RPC endpoints in production config?",
+      "recommendation": "Add operational details: 'CONFIG and NODE_ENV set in .github/workflows/[workflow-name].yml', 'RPC endpoints configured in src/front/config/mainnet.prod.js (not env vars, checked into repo)', 'GitHub Actions secrets: buildbot (contains deploy key for swaponline.github.io repo)'. Link to actual workflow file."
+    },
+    {
+      "severity": "major",
+      "category": "missing-operational",
+      "file": "deployment.md",
+      "section": "Bot deployment",
+      "description": "CLAUDE.md mentions market-maker bot runs server-side via Node.js, but deployment.md only covers GitHub Pages (static SPA). No documentation for bot deployment: where does bot run? How is it deployed? What env vars does bot need? Where are bot logs?",
+      "recommendation": "Add bot deployment section to deployment.md: platform (pm2 on server? Docker?), access info (SSH to which server?), env vars for bot, how to start/stop bot, where bot logs are located, monitoring/health checks for bot."
+    },
+    {
+      "severity": "major",
+      "category": "placeholder",
+      "file": "patterns.md",
+      "section": "Project-Specific Code Patterns, Testing Infrastructure, Business Rules",
+      "description": "Three major sections are empty templates with only HTML comments showing examples (lines 10-20, 67-68, 92-112). This is unfinished documentation - placeholder text remains from template.",
+      "recommendation": "Fill or remove empty sections. For 'Project-Specific Code Patterns': add patterns mentioned in CLAUDE.md (module aliases usage, redaction action pattern, config system usage). For 'Testing Infrastructure': describe how to run tests (already partially documented). For 'Business Rules': either document atomic swap lifecycle or delete section if no complex domain logic exists."
+    },
+    {
+      "severity": "minor",
+      "category": "inconsistency",
+      "file": "architecture.md + deployment.md",
+      "section": "libp2p signaling server terminology",
+      "description": "architecture.md calls it 'star.wpmix.net' (WebRTC STAR transport), deployment.md doesn't mention it at all, CLAUDE.md also mentions 'star.wpmix.net'. Consistent naming but missing from deployment operational details.",
+      "recommendation": "Add to deployment.md under External Integrations or Infrastructure: 'P2P signaling: star.wpmix.net (public WebRTC STAR relay, no auth, no SLA, fallback strategy: none configured)'. This is operational information that can't be read from code."
+    },
+    {
+      "severity": "minor",
+      "category": "inconsistency",
+      "file": "CLAUDE.md + architecture.md",
+      "section": "React version",
+      "description": "CLAUDE.md says 'React 18.3', architecture.md says 'React 18.3'. Consistent, but minor: version numbers in docs get outdated when dependencies update.",
+      "recommendation": "Consider removing exact version numbers from architecture.md, keep only major version: 'React 18 (concurrent mode)' instead of 'React 18.3'. Versions are always accurate in package.json, no need to duplicate."
+    },
+    {
+      "severity": "minor",
+      "category": "bloat",
+      "file": "ux-guidelines.md",
+      "section": "Domain Glossary",
+      "description": "Domain glossary is detailed but some entries are over-explained. 'Address' entry has meta-commentary '(NOT wallet address - wallet has multiple addresses)' which is more of a correctness note than glossary definition.",
+      "recommendation": "Simplify glossary entries to definition + UI example only. Move correctness notes to a separate 'Common Mistakes' section if needed, or remove if obvious. Keep glossary concise."
+    },
+    {
+      "severity": "minor",
+      "category": "missing-operational",
+      "file": "deployment.md",
+      "section": "Access Information",
+      "description": "Says 'GitHub Actions secrets (buildbot secret for deploy script)' but doesn't explain how to rotate the secret or where it came from. If deploy key needs to be regenerated, how?",
+      "recommendation": "Add: 'buildbot secret is SSH deploy key for swaponline.github.io repo. To rotate: generate new SSH key, add to repo deploy keys on GitHub, update buildbot secret in Actions settings.' This is operational knowledge that can't be read from code."
+    }
+  ],
+  "missingFiles": [],
+  "metrics": {
+    "totalFindings": 12,
+    "critical": 1,
+    "major": 7,
+    "minor": 4,
+    "totalSizeKB": 24.75,
+    "claudeMdSizeKB": 7.5,
+    "referencesSizeKB": 24.75
+  }
+}
