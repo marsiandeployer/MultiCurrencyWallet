@@ -76,3 +76,6 @@ Developer? Start with [ONBOARDING](https://github.com/swaponline/MultiCurrencyWa
 
 Any questions [are welcome](https://t.me/swaponline)
 
+## Engineering updates
+
+- Android CI workflow added: `.github/workflows/android-ci.yml` (build + unit tests for `android/` project)
