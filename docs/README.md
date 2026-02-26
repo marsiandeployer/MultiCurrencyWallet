@@ -76,3 +76,8 @@ Developer? Start with [ONBOARDING](https://github.com/swaponline/MultiCurrencyWa
 
 Any questions [are welcome](https://t.me/swaponline)
 
+## Engineering updates
+
+- Android CI workflow added: `.github/workflows/android-ci.yml` (build + unit tests for `android/` project)
+- Native Android MVP wallet scaffold added in `android/` (create/import by 12-word seed, local encrypted storage, no exchange)
+- Pullrequest web CI (`.github/workflows/nodejs.yml`) now skips Android-only PRs

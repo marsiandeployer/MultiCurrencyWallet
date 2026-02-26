@@ -1,6 +1,12 @@
 name: Pullrequest build & test
 
-on: [pull_request]
+on:
+  pull_request:
+    paths-ignore:
+      - "android/**"
+      - "docs/**"
+      - ".github/workflows/android-ci.yml"
+      - ".github/workflows/nodejs.yml"
 
 jobs:
   build:
@@ -57,4 +63,3 @@ jobs:
         # if-no-files-found: ignore
       # env:
         # CI: true
-
